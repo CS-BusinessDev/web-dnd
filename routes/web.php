@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DailyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmployeeReviewController;
 use App\Http\Controllers\KpiCategoryController;
 use App\Http\Controllers\KpiController;
 use App\Http\Controllers\KpiDashboardController;
@@ -128,11 +130,26 @@ Route::middleware('auth')->group(
         Route::get('/kpi/{kpi}/edit', [KpiController::class, 'edit']);
         Route::get('/kpi/{kpiId}/kpiDetail', [KpiController::class, 'getKpiDetail']);
         Route::post('/kpi/{kpi}/update', [KpiController::class, 'update']);
-        Route::get('/kpi/{kpi}/delete', [KpiController::class, 'destroy']);  
+        Route::get('/kpi/{kpi}/delete', [KpiController::class, 'destroy']);
         Route::post('/kpi/import', [KpiController::class, 'import']);
         Route::get('/kpi/exportMonthly', [KpiController::class, 'exportMonthly']);
         Route::post('/kpi/export', [KpiController::class, 'exportPerDivision']);
         Route::post('/kpi/copy', [KpiController::class, 'copyKpi']);
+
+        Route::get('/teams', [EmployeeReviewController::class, 'myTeam']);
+
+        Route::get('/attendance/download', [EmployeeReviewController::class, 'downloadTeams']);
+
+        ##ROUTE ATTENDANCE
+        Route::resource('attendance', AttendanceController::class);
+        Route::post('attendance/import', [AttendanceController::class, 'import'])->name('attendance.import');
+        Route::get('/attendance/download', [AttendanceController::class, 'download']);
+
+        ##ROUTE EMPLOYEE REVIEW
+        Route::get('employee_reviews/download', [EmployeeReviewController::class, 'download']);
+        Route::post('employee_reviews/import', [EmployeeReviewController::class, 'import']);
+        Route::resource('employee_reviews', EmployeeReviewController::class);
+
 
         ##ROUTE ADMIN
         Route::middleware('isAdmin')->group(function () {
@@ -230,7 +247,6 @@ Route::middleware('auth')->group(
             Route::get('/position/{position}/delete', [PositionController::class, 'destroy']);
             Route::post('/position/import', [PositionController::class, 'import']);
             Route::get('/position/template', [PositionController::class, 'template']);
-
         });
     }
 );
