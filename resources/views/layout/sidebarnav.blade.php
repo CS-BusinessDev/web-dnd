@@ -52,7 +52,7 @@
                      <li class="nav-item">
                          <a href='/teams' class="nav-link {{ $active === 'my_team' ? 'active' : '' }}"
                              style="{{ $active === 'my_team' ? 'background-color: #917FB3; color: white;' : '' }}">
-                             <i class="nav-icon fa fa-list"></i>
+                             <i class="nav-icon fa fa-briefcase"></i>
                              <p>My Team</p>
                          </a>
                      </li>

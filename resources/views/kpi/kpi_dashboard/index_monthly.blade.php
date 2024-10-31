@@ -22,9 +22,10 @@
                             <div class="row d-inline-flex ml-2">
                                 <ul class="nav nav-pills">
                                     <li class="nav-item"><a class="nav-link" href="/dash-kpi" style="color: #917FB3;">Dashboard</a></li>
-                                    <!-- <li class="nav-item"><a class="nav-link" href="/dash-daily">Daily</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="/dash-weekly">Weekly</a></li> -->
+                                    {{-- <li class="nav-item"><a class="nav-link" href="/dash-daily">Daily</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/dash-weekly">Weekly</a></li> --}}
                                     <li class="nav-item"><a class="nav-link active" href="/dash-monthly" style="background-color: #917FB3;">KPI</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/leaderboard">Leaderboard</a></li>
                                 </ul>
                             </div>
                             <div class="card-tools d-flex align-items-center">

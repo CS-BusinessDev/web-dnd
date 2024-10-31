@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Area;
 use App\Models\Divisi;
 use App\Models\Kpi;
 use App\Models\KpiDetail;
@@ -23,20 +24,20 @@ class KpiDashboardController extends Controller
         $currentYear = Carbon::now()->year;
 
         $kpis = Kpi::with('kpi_detail', 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user')
-        ->where('user_id', auth()->user()->id)
-        ->where('kpi_type_id', 1)
-        ->whereMonth('date', $currentMonth)
-        ->whereYear('date', $currentYear)
-        ->orderBy('date', 'DESC')
-        ->get();
+            ->where('user_id', auth()->user()->id)
+            ->where('kpi_type_id', 1)
+            ->whereMonth('date', $currentMonth)
+            ->whereYear('date', $currentYear)
+            ->orderBy('date', 'DESC')
+            ->get();
 
         if ($request->month) {
             $date = Carbon::createFromFormat('m/Y', $request->month);
 
             $kpisQuery = Kpi::with('kpi_detail', 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user')
-            ->where('kpi_type_id', 1)
-            ->whereMonth('date', $date->month)
-            ->whereYear('date', $date->year);
+                ->where('kpi_type_id', 1)
+                ->whereMonth('date', $date->month)
+                ->whereYear('date', $date->year);
 
             $user_id = $request->input('user_id');
 
@@ -47,7 +48,7 @@ class KpiDashboardController extends Controller
             }
 
             $kpis = $kpisQuery->orderBy('date', 'DESC')
-            ->get();
+                ->get();
         }
 
         // Group the KPIs by date
@@ -94,20 +95,20 @@ class KpiDashboardController extends Controller
         $currentYear = Carbon::now()->year;
 
         $kpis = Kpi::with('kpi_detail', 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user')
-        ->where('user_id', auth()->user()->id)
-        ->where('kpi_type_id', 2)
-        ->whereMonth('date', $currentMonth)
-        ->whereYear('date', $currentYear)
-        ->orderBy('date', 'DESC')
-        ->get();
+            ->where('user_id', auth()->user()->id)
+            ->where('kpi_type_id', 2)
+            ->whereMonth('date', $currentMonth)
+            ->whereYear('date', $currentYear)
+            ->orderBy('date', 'DESC')
+            ->get();
 
         if ($request->month) {
             $date = Carbon::createFromFormat('m/Y', $request->month);
 
             $kpisQuery = Kpi::with('kpi_detail', 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user')
-            ->where('kpi_type_id', 2)
-            ->whereMonth('date', $date->month)
-            ->whereYear('date', $date->year);
+                ->where('kpi_type_id', 2)
+                ->whereMonth('date', $date->month)
+                ->whereYear('date', $date->year);
 
             $user_id = $request->input('user_id');
 
@@ -118,7 +119,7 @@ class KpiDashboardController extends Controller
             }
 
             $kpis = $kpisQuery->orderBy('date', 'DESC')
-            ->get();
+                ->get();
         }
 
         // Group the KPIs by yearly week
@@ -179,9 +180,9 @@ class KpiDashboardController extends Controller
             $date = Carbon::createFromFormat('m/Y', $request->month);
 
             $kpisQuery = Kpi::with('kpi_detail', 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user')
-            ->where('kpi_type_id', 3)
-            ->whereMonth('date', $date->month)
-            ->whereYear('date', $date->year);
+                ->where('kpi_type_id', 3)
+                ->whereMonth('date', $date->month)
+                ->whereYear('date', $date->year);
 
             $user_id = $request->input('user_id');
 
@@ -192,7 +193,7 @@ class KpiDashboardController extends Controller
             }
 
             $kpis = $kpisQuery->orderBy('date', 'DESC')
-            ->get();
+                ->get();
         }
 
         // Group the KPIs by yearly month
@@ -252,7 +253,6 @@ class KpiDashboardController extends Controller
             // $averageTotalScore = $totalScore / $totalKpiCategories;
         }
 
-
         return view('kpi.kpi_dashboard.index_monthly', [
             'title' => 'KPI Dashboard',
             'active' => 'kpi-dashboard',
@@ -263,7 +263,8 @@ class KpiDashboardController extends Controller
         ]);
     }
 
-    public function indexKpi(Request $request) {
+    public function indexKpi(Request $request)
+    {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
@@ -284,10 +285,10 @@ class KpiDashboardController extends Controller
             $date = Carbon::createFromFormat('m/Y', $request->dateChartHighestKpiWeekly);
 
             $weeklyKpis = $weeklyKpis->whereMonth('date', $date->month)
-            ->whereYear('date', $date->year);
+                ->whereYear('date', $date->year);
         } else {
             $weeklyKpis = $weeklyKpis->whereMonth('date', $currentMonth)
-            ->whereYear('date', $currentYear);
+                ->whereYear('date', $currentYear);
         }
 
         // KALAU FILTER MONTH DI CHART KPI MONTHLY
@@ -297,10 +298,10 @@ class KpiDashboardController extends Controller
             $dateChartHighestKpiMonthly = Carbon::parse($date)->format('M Y');
 
             $monthlyKpis = $monthlyKpis->whereMonth('date', $date->month)
-            ->whereYear('date', $date->year);
+                ->whereYear('date', $date->year);
         } else {
             $monthlyKpis = $monthlyKpis->whereMonth('date', $currentMonth)
-            ->whereYear('date', $currentYear);
+                ->whereYear('date', $currentYear);
         }
 
         //KALAU FILTER YEAR DI CHART KPI YEARLY
@@ -330,14 +331,14 @@ class KpiDashboardController extends Controller
         }
 
         // KALAU FILTER DIVISI DI CHART KPI WEEKLY
-        if($request->divisi_weekly) {
+        if ($request->divisi_weekly) {
             $weeklyKpis = $weeklyKpis->whereHas('user', function ($q) use ($request) {
                 $q->where('divisi_id', $request->divisi_weekly);
             });
         }
 
         // KALAU FILTER DIVISI DI CHART KPI MONTHLY
-        if($request->divisi_monthly) {
+        if ($request->divisi_monthly) {
             $monthlyKpis = $monthlyKpis->whereHas('user', function ($q) use ($request) {
                 $q->where('divisi_id', $request->divisi_monthly);
             });
@@ -346,7 +347,7 @@ class KpiDashboardController extends Controller
         }
 
         // KALAU FILTER DIVISI DI CHART KPI YEARLY
-        if($request->divisi_yearly) {
+        if ($request->divisi_yearly) {
             $yearlyKpis = $yearlyKpis->whereHas('user', function ($q) use ($request) {
                 $q->where('divisi_id', $request->divisi_yearly);
             });
@@ -355,7 +356,7 @@ class KpiDashboardController extends Controller
         }
 
         // KALAU FILTER USER DI CHART USERS KPI YEARLY
-        if($request->user_yearly) {
+        if ($request->user_yearly) {
             $usersYearlyKpis = $usersYearlyKpis->whereHas('user', function ($q) use ($request) {
                 $q->where('id', $request->user_yearly);
             });
@@ -394,16 +395,16 @@ class KpiDashboardController extends Controller
         }
 
         $weeklyKpis = $weeklyKpis->orderBy('date', 'DESC')
-        ->get();
+            ->get();
 
         $monthlyKpis = $monthlyKpis->orderBy('date', 'DESC')
-        ->get();
+            ->get();
 
         $yearlyKpis = $yearlyKpis->orderBy('date', 'DESC')
-        ->get();
+            ->get();
 
         $usersYearlyKpis = $usersYearlyKpis->orderBy('date', 'DESC')
-        ->get();
+            ->get();
 
         // Group the KPIs by yearly month
         $groupedKpisByYear = $weeklyKpis->groupBy(function ($kpi) {
@@ -525,7 +526,7 @@ class KpiDashboardController extends Controller
         foreach ($userTotalScores as $userId => $totalScore) {
             $user = User::find($userId); // Assuming you have a "User" model.
 
-             if ($user && $totalScore > 0) {
+            if ($user && $totalScore > 0) {
                 $highestKpiWeeklyUser[] = $user->nama_lengkap ?? '-'; // Assuming the user's name field is "name". Replace it with the actual field name.
                 $highestKpiWeeklyUnit[] = $totalScore * 100; // Add the user's total score to the array
             }
@@ -535,7 +536,7 @@ class KpiDashboardController extends Controller
         foreach ($userTotalScoresMonthly as $userId => $totalScoreMonthly) {
             $user = User::find($userId); // Assuming you have a "User" model.
 
-             if ($user && $totalScoreMonthly > 0) {
+            if ($user && $totalScoreMonthly > 0) {
                 $highestKpiMonthlyUser[] = $user->nama_lengkap ?? '-'; // Assuming the user's name field is "name". Replace it with the actual field name.
                 $highestKpiMonthlyUnit[] = $totalScoreMonthly * 100; // Add the user's total score to the array
             }
@@ -677,23 +678,25 @@ class KpiDashboardController extends Controller
         ]);
     }
 
-    public function getUser() {
+    public function getUser()
+    {
         if (auth()->user()->role_id == 1) {
             $users = User::where('id', '<>', 1)
-            ->orderBy('nama_lengkap')
-            ->get();
+                ->orderBy('nama_lengkap')
+                ->get();
         } else {
             $users = User::where('divisi_id', auth()->user()->divisi_id)
-            ->whereIn('role_id', [2, 3])
-            ->orWhere('id', auth()->user()->id)
-            ->orderBy('nama_lengkap')
-            ->get();
+                ->whereIn('role_id', [2, 3])
+                ->orWhere('id', auth()->user()->id)
+                ->orderBy('nama_lengkap')
+                ->get();
         }
 
         return $users;
     }
 
-    public function changeStatus(Request $request) {
+    public function changeStatus(Request $request)
+    {
         try {
             // VALIDASI WAKTU
             $currentDate = Carbon::now();
@@ -746,5 +749,116 @@ class KpiDashboardController extends Controller
             return redirect()->back()->with(['error' => $e->getMessage()]);
         }
     }
+
+    public function leaderboard(Request $request)
+{
+    $title = 'Leaderboard';
+    $active = 'leaderboard';
+
+    // Determine month and year based on request or default to the current month/year
+    $selectedPeriod = $request->month ? $request->month : Carbon::now()->format('Y-m');
+    $divisionId = $request->division;
+    $areaId = $request->area;
+
+    $leaderboardData = [];
+
+    // Use chunking to load users and related data in smaller sets
+    $userQuery = User::with([
+        'divisi', // Change from 'division' to 'divisi'
+        'area',
+        'attendance' => function ($query) use ($selectedPeriod) {
+            $query->select('user_id', 'late_less_30', 'late_more_30', 'sick_days', 'periode')
+                ->where('periode', $selectedPeriod);
+        },
+        'employeeReview' => function ($query) use ($selectedPeriod) {
+            $query->select('user_id', 'responsiveness', 'problem_solver', 'helpfulness', 'initiative', 'periode')
+                ->where('periode', $selectedPeriod);
+        },
+        'kpi' => function ($query) use ($selectedPeriod) {
+            $query->select('id', 'user_id', 'percentage', 'date')
+                ->where('kpi_type_id', 3)
+                ->whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$selectedPeriod])
+                ->orderBy('date', 'DESC')
+                ->with(['kpi_detail' => function ($query) {
+                    $query->whereNotNull('value_result')->where('value_result', '>=', 0);
+                }]);
+        }
+    ]);
+
+    // Apply division filter if provided
+    if ($divisionId) {
+        $userQuery->where('divisi_id', $divisionId); // Change from 'division_id' to 'divisi_id'
+    }
+
+    // Apply area filter if provided
+    if ($areaId) {
+        $userQuery->where('area_id', $areaId);
+    }
+
+    $userQuery->chunk(100, function ($users) use (&$leaderboardData) {
+        foreach ($users as $user) {
+            $kpiScore = 0;
+            $attendanceScore = 0;
+            $activityScore = 0;
+            $totalScore = 0;
+
+            // KPI Score Calculation
+            foreach ($user->kpi as $kpi) {
+                $actualCount = $kpi->kpi_detail->sum('value_result');
+                $count = $kpi->kpi_detail->count();
+                $divisor = $count > 0 ? $count : 1;
+                $score = ($kpi->percentage / 100) * ($actualCount / $divisor);
+                $kpiScore += $score * 100;
+            }
+
+            $kpiScore = min(40, $kpiScore * 0.4);
+            $totalScore += $kpiScore;
+
+            // Attendance Score Calculation for the selected period
+            if ($user->attendance !== null) {
+                $attendance = $user->attendance;
+                $lateLess30 = $attendance->late_less_30 ?? 0;
+                $lateMore30 = $attendance->late_more_30 ?? 0;
+                $sickDays = $attendance->sick_days ?? 0;
+
+                $attendanceScore = 40 - ($lateLess30 * 1) - ($lateMore30 * 3) - ($sickDays * 5);
+                $attendanceScore = max($attendanceScore, 0);
+                $totalScore += $attendanceScore;
+            }
+
+            // Activity Score Calculation for the selected period
+            if ($user->employeeReview !== null) {
+                $review = $user->employeeReview;
+                $responsiveness = $review->responsiveness ?? 0;
+                $problemSolver = $review->problem_solver ?? 0;
+                $helpfulness = $review->helpfulness ?? 0;
+                $initiative = $review->initiative ?? 0;
+
+                $activityScore = ($responsiveness + $problemSolver + $helpfulness + $initiative) / 20 * 100 * 0.2;
+                $totalScore += $activityScore;
+            }
+
+            // Append user score data
+            $leaderboardData[] = [
+                'user' => $user,
+                'kpiScore' => $kpiScore,
+                'attendanceScore' => $attendanceScore,
+                'activityScore' => $activityScore,
+                'totalScore' => $totalScore,
+            ];
+        }
+    });
+
+    // Sort leaderboard by totalScore
+    usort($leaderboardData, function ($a, $b) {
+        return $b['totalScore'] <=> $a['totalScore'];
+    });
+
+    // Fetch divisions and areas for the filter dropdowns
+    $divisions = Divisi::all(); // Ensure you use Divisi model if division is named as divisi in the DB
+    $areas = Area::all();
+
+    return view('kpi.kpi_dashboard.leaderboard', compact('title', 'active', 'leaderboardData', 'divisions', 'areas'));
+}
 
 }

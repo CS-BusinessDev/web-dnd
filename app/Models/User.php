@@ -104,4 +104,20 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Position::class);
     }
+
+
+    public function attendance()
+    {
+        return $this->hasOne(Attendance::class);
+    }
+
+    public function employeeReview()
+    {
+        return $this->hasOne(EmployeeReview::class);
+    }
+
+    public function kpi()
+    {
+        return $this->hasMany(Kpi::class);
+    }
 }

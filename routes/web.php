@@ -150,6 +150,9 @@ Route::middleware('auth')->group(
         Route::post('employee_reviews/import', [EmployeeReviewController::class, 'import']);
         Route::resource('employee_reviews', EmployeeReviewController::class);
 
+        ##ROUTE LEADERBOARD
+        Route::get('leaderboard', [KpiDashboardController::class, 'leaderboard']);
+
 
         ##ROUTE ADMIN
         Route::middleware('isAdmin')->group(function () {
