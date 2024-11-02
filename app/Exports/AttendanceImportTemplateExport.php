@@ -22,6 +22,7 @@ class AttendanceImportTemplateExport implements FromCollection, WithHeadings
             return [
                 'nama_lengkap' => $user->nama_lengkap,
                 'periode' => $currentPeriod,
+                'work_days' => '',
                 'late_less_30' => '', // Leave blank
                 'late_more_30' => '', // Leave blank
                 'sick_days' => '',    // Leave blank
@@ -38,6 +39,7 @@ class AttendanceImportTemplateExport implements FromCollection, WithHeadings
         return [
             'Nama Lengkap',
             'Periode',
+            'Hari Kerja',
             'Late Less 30 min',
             'Late More 30 min',
             'Sakit or Izin',

@@ -49,6 +49,13 @@
 
                                     <!-- Late Less Than 30 Minutes -->
                                     <div class="form-group">
+                                        <label for="late_less_30">Hari Efektif Kerja</label>
+                                                <input type="number" class="form-control" name="work_days"
+                                                    min="0" placeholder="0" required>
+                                    </div>
+
+                                    <!-- Late Less Than 30 Minutes -->
+                                    <div class="form-group">
                                         <label for="late_less_30">Keterlambatan < 30 Menit</label>
                                                 <input type="number" class="form-control" name="late_less_30"
                                                     min="0" placeholder="0" required>

@@ -66,6 +66,7 @@ class AttendanceImport implements ToModel, WithHeadingRow
             return new Attendance([
                 'user_id' => $userId,
                 'periode' => $periode,
+                'work_days' => $row['hari_kerja'] ?? 0,
                 'late_less_30' => $row['late_less_30_min'] ?? 0,
                 'late_more_30' => $row['late_more_30_min'] ?? 0,
                 'sick_days' => $row['sakit_or_izin'] ?? 0,

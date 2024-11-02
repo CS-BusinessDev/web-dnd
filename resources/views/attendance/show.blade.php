@@ -17,6 +17,10 @@
                 <td>{{ $attendance->periode }}</td>
             </tr>
             <tr>
+                <th>Hari Kerja</th>
+                <td>{{ $attendance->work_days }}</td>
+            </tr>
+            <tr>
                 <th>Keterlambatan < 30 Menit</th>
                 <td>{{ $attendance->late_less_30 }}</td>
             </tr>
@@ -25,7 +29,7 @@
                 <td>{{ $attendance->late_more_30 }}</td>
             </tr>
             <tr>
-                <th>Hari Sakit</th>
+                <th>Hari Sakit/Izin</th>
                 <td>{{ $attendance->sick_days }}</td>
             </tr>
         </table>

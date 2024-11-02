@@ -61,6 +61,7 @@
                                         <tr>
                                             <th>Nama Lengkap</th>
                                             <th>Periode</th>
+                                            <th>Hari Kerja</th>
                                             <th>Keterlambatan < 30 Menit</th>
                                             <th>Keterlambatan > 30 Menit</th>
                                             <th>Sakit/Izin</th>
@@ -72,6 +73,7 @@
                                             <tr>
                                                 <td>{{ $attendance->user->nama_lengkap }}</td>
                                                 <td>{{ $attendance->periode }}</td>
+                                                <td>{{ $attendance->work_days }}</td>
                                                 <td>{{ $attendance->late_less_30 }}</td>
                                                 <td>{{ $attendance->late_more_30 }}</td>
                                                 <td>{{ $attendance->sick_days }}</td>

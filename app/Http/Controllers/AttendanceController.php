@@ -50,6 +50,7 @@ class AttendanceController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'periode' => 'required|date_format:Y-m',
+            'work_days' => 'required|integer|min:0',
             'late_less_30' => 'nullable|integer|min:0',
             'late_more_30' => 'nullable|integer|min:0',
             'sick_days' => 'nullable|integer|min:0',
@@ -113,6 +114,7 @@ class AttendanceController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'periode' => 'required|string',
+            'work_days' => 'required|integer|min:0',
             'late_less_30' => 'nullable|integer|min:0',
             'late_more_30' => 'nullable|integer|min:0',
             'sick_days' => 'nullable|integer|min:0',

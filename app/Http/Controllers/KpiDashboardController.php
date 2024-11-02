@@ -751,114 +751,128 @@ class KpiDashboardController extends Controller
     }
 
     public function leaderboard(Request $request)
-{
-    $title = 'Leaderboard';
-    $active = 'leaderboard';
+    {
+        $title = 'Leaderboard';
+        $active = 'leaderboard';
 
-    // Determine month and year based on request or default to the current month/year
-    $selectedPeriod = $request->month ? $request->month : Carbon::now()->format('Y-m');
-    $divisionId = $request->division;
-    $areaId = $request->area;
+        // Determine month and year based on request or default to the current month/year
+        $selectedPeriod = $request->month ? $request->month : Carbon::now()->format('Y-m');
+        $divisionId = $request->division;
+        $areaId = $request->area;
 
-    $leaderboardData = [];
+        $leaderboardData = [];
 
-    // Use chunking to load users and related data in smaller sets
-    $userQuery = User::with([
-        'divisi', // Change from 'division' to 'divisi'
-        'area',
-        'attendance' => function ($query) use ($selectedPeriod) {
-            $query->select('user_id', 'late_less_30', 'late_more_30', 'sick_days', 'periode')
-                ->where('periode', $selectedPeriod);
-        },
-        'employeeReview' => function ($query) use ($selectedPeriod) {
-            $query->select('user_id', 'responsiveness', 'problem_solver', 'helpfulness', 'initiative', 'periode')
-                ->where('periode', $selectedPeriod);
-        },
-        'kpi' => function ($query) use ($selectedPeriod) {
-            $query->select('id', 'user_id', 'percentage', 'date')
-                ->where('kpi_type_id', 3)
-                ->whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$selectedPeriod])
-                ->orderBy('date', 'DESC')
-                ->with(['kpi_detail' => function ($query) {
-                    $query->whereNotNull('value_result')->where('value_result', '>=', 0);
-                }]);
+        // Use chunking to load users and related data in smaller sets
+        $userQuery = User::with([
+            'divisi', // Change from 'division' to 'divisi'
+            'area',
+            'attendance' => function ($query) use ($selectedPeriod) {
+                $query->select('user_id', 'late_less_30', 'late_more_30', 'sick_days', 'work_days', 'periode')
+                    ->where('periode', $selectedPeriod);
+            },
+            'employeeReview' => function ($query) use ($selectedPeriod) {
+                $query->select('user_id', 'responsiveness', 'problem_solver', 'helpfulness', 'initiative', 'periode')
+                    ->where('periode', $selectedPeriod);
+            },
+            'kpi' => function ($query) use ($selectedPeriod) {
+                $query->select('id', 'user_id', 'percentage', 'date')
+                    ->where('kpi_type_id', 3)
+                    ->whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$selectedPeriod])
+                    ->orderBy('date', 'DESC')
+                    ->with(['kpi_detail' => function ($query) {
+                        $query->whereNotNull('value_result')->where('value_result', '>=', 0);
+                    }]);
+            }
+        ]);
+
+        // Apply division filter if provided
+        if ($divisionId) {
+            $userQuery->where('divisi_id', $divisionId); // Change from 'division_id' to 'divisi_id'
         }
-    ]);
 
-    // Apply division filter if provided
-    if ($divisionId) {
-        $userQuery->where('divisi_id', $divisionId); // Change from 'division_id' to 'divisi_id'
-    }
-
-    // Apply area filter if provided
-    if ($areaId) {
-        $userQuery->where('area_id', $areaId);
-    }
-
-    $userQuery->chunk(100, function ($users) use (&$leaderboardData) {
-        foreach ($users as $user) {
-            $kpiScore = 0;
-            $attendanceScore = 0;
-            $activityScore = 0;
-            $totalScore = 0;
-
-            // KPI Score Calculation
-            foreach ($user->kpi as $kpi) {
-                $actualCount = $kpi->kpi_detail->sum('value_result');
-                $count = $kpi->kpi_detail->count();
-                $divisor = $count > 0 ? $count : 1;
-                $score = ($kpi->percentage / 100) * ($actualCount / $divisor);
-                $kpiScore += $score * 100;
-            }
-
-            $kpiScore = min(40, $kpiScore * 0.4);
-            $totalScore += $kpiScore;
-
-            // Attendance Score Calculation for the selected period
-            if ($user->attendance !== null) {
-                $attendance = $user->attendance;
-                $lateLess30 = $attendance->late_less_30 ?? 0;
-                $lateMore30 = $attendance->late_more_30 ?? 0;
-                $sickDays = $attendance->sick_days ?? 0;
-
-                $attendanceScore = 40 - ($lateLess30 * 1) - ($lateMore30 * 3) - ($sickDays * 5);
-                $attendanceScore = max($attendanceScore, 0);
-                $totalScore += $attendanceScore;
-            }
-
-            // Activity Score Calculation for the selected period
-            if ($user->employeeReview !== null) {
-                $review = $user->employeeReview;
-                $responsiveness = $review->responsiveness ?? 0;
-                $problemSolver = $review->problem_solver ?? 0;
-                $helpfulness = $review->helpfulness ?? 0;
-                $initiative = $review->initiative ?? 0;
-
-                $activityScore = ($responsiveness + $problemSolver + $helpfulness + $initiative) / 20 * 100 * 0.2;
-                $totalScore += $activityScore;
-            }
-
-            // Append user score data
-            $leaderboardData[] = [
-                'user' => $user,
-                'kpiScore' => $kpiScore,
-                'attendanceScore' => $attendanceScore,
-                'activityScore' => $activityScore,
-                'totalScore' => $totalScore,
-            ];
+        // Apply area filter if provided
+        if ($areaId) {
+            $userQuery->where('area_id', $areaId);
         }
-    });
 
-    // Sort leaderboard by totalScore
-    usort($leaderboardData, function ($a, $b) {
-        return $b['totalScore'] <=> $a['totalScore'];
-    });
+        $userQuery->chunk(100, function ($users) use (&$leaderboardData) {
+            foreach ($users as $user) {
+                $kpiScore = 0;
+                $attendanceScore = 0;
+                $activityScore = 0;
+                $totalScore = 0;
 
-    // Fetch divisions and areas for the filter dropdowns
-    $divisions = Divisi::all(); // Ensure you use Divisi model if division is named as divisi in the DB
-    $areas = Area::all();
+                // KPI Score Calculation
+                foreach ($user->kpi as $kpi) {
+                    $actualCount = $kpi->kpi_detail->sum('value_result');
+                    $count = $kpi->kpi_detail->count();
+                    $divisor = $count > 0 ? $count : 1;
+                    $score = ($kpi->percentage / 100) * ($actualCount / $divisor);
+                    $kpiScore += $score * 100;
+                }
 
-    return view('kpi.kpi_dashboard.leaderboard', compact('title', 'active', 'leaderboardData', 'divisions', 'areas'));
-}
+                $kpiScore = min(40, $kpiScore * 0.4);
+                $totalScore += $kpiScore;
 
+                if ($user->attendance !== null) {
+                    $attendance = $user->attendance;
+                    $lateLess30 = $attendance->late_less_30 ?? 0;
+                    $lateMore30 = $attendance->late_more_30 ?? 0;
+                    $sickDays = $attendance->sick_days ?? 0;
+                    $permissionDays = $attendance->permission_days ?? 0; // Tambahkan jika ada kolom izin
+                    $nonCompliance = $attendance->non_compliance ?? 0; // Tambahkan jika ada kolom ketidaksesuaian
+                    $workDays = $attendance->work_days ?? 0;
+
+                    // Persentase pencapaian awal absensi
+                    $initialAttendanceAchv = ($workDays > 0) ? ($workDays - $lateLess30 - $lateMore30 - $sickDays - $permissionDays - $nonCompliance) / $workDays * 100 : 0;
+
+                    // Menghitung total pengurangan poin
+                    $penalty = ($lateLess30 * 1) + ($lateMore30 * 3) + ($sickDays * 5) + ($permissionDays * 5) + ($nonCompliance * 5);
+
+                    // Mengurangi pencapaian absensi dengan total pengurang (sesuai skema 1)
+                    $finalAttendanceAchv = max(0, $initialAttendanceAchv - $penalty);
+
+                    // Bobot KPI absensi
+                    $attendanceWeight = 40;
+
+                    // Menghitung skor KPI absensi setelah pengurangan
+                    $attendanceScore = ($finalAttendanceAchv / 100) * $attendanceWeight;
+                    $totalScore += $attendanceScore;
+                }
+
+
+                // Activity Score Calculation for the selected period
+                if ($user->employeeReview !== null) {
+                    $review = $user->employeeReview;
+                    $responsiveness = $review->responsiveness ?? 0;
+                    $problemSolver = $review->problem_solver ?? 0;
+                    $helpfulness = $review->helpfulness ?? 0;
+                    $initiative = $review->initiative ?? 0;
+
+                    $activityScore = ($responsiveness + $problemSolver + $helpfulness + $initiative) / 20 * 100 * 0.2;
+                    $totalScore += $activityScore;
+                }
+
+                // Append user score data
+                $leaderboardData[] = [
+                    'user' => $user,
+                    'kpiScore' => $kpiScore,
+                    'attendanceScore' => $attendanceScore,
+                    'activityScore' => $activityScore,
+                    'totalScore' => $totalScore,
+                ];
+            }
+        });
+
+        // Sort leaderboard by totalScore
+        usort($leaderboardData, function ($a, $b) {
+            return $b['totalScore'] <=> $a['totalScore'];
+        });
+
+        // Fetch divisions and areas for the filter dropdowns
+        $divisions = Divisi::all(); // Ensure you use Divisi model if division is named as divisi in the DB
+        $areas = Area::all();
+
+        return view('kpi.kpi_dashboard.leaderboard', compact('title', 'active', 'leaderboardData', 'divisions', 'areas'));
+    }
 }
