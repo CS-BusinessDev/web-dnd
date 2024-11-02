@@ -74,7 +74,7 @@
 
                                     <!-- Sick Days -->
                                     <div class="form-group">
-                                        <label for="sick_days">Hari Sakit</label>
+                                        <label for="sick_days">Hari Sakit/Izin</label>
                                         <input type="number" class="form-control" name="sick_days"
                                             value="{{ $attendance->sick_days }}" min="0" placeholder="0" required>
                                     </div>
