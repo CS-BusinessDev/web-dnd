@@ -99,7 +99,7 @@
                  </li>
                  @endauth
 
-                 <li class="nav-item">
+                 {{-- <li class="nav-item">
                      <a href="#" class="nav-link">
                          <i class="nav-icon fas fa-calendar-check"></i>
                          <p>
@@ -192,7 +192,7 @@
                              </li>
                          </ul>
                      @endif
-                 </li>
+                 </li> --}}
                  @if (auth()->user()->role_id == 1)
                      <li class="nav-item">
                          <a href="#" class="nav-link">
@@ -283,7 +283,7 @@
                          </ul>
                      </li>
                  @else
-                     <li class="nav-item {{ $active === 'teams-daily' ? 'menu-open' : 'menu' }}">
+                     {{-- <li class="nav-item {{ $active === 'teams-daily' ? 'menu-open' : 'menu' }}">
                          <a href="#" class="nav-link">
                              <i class="nav-icon fas fa-users"></i>
                              <p>
@@ -313,7 +313,7 @@
                                  </a>
                              </li>
                          </ul>
-                     </li>
+                     </li> --}}
                  @endif
              </ul>
          </nav>
