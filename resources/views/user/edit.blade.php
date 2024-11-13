@@ -21,14 +21,18 @@
                                             value="{{ $user->nama_lengkap }}" name="nama_lengkap" required>
                                     </div>
                                     <div class="row">
-                                        <div class="mb-3 col-lg-6">
+                                        <div class="mb-3 col-lg-4">
                                             <label for="username" class="form-label">User Name</label>
                                             <input type="text" class="form-control" id="username" name="username"
                                                 value="{{ $user->username }}" required>
                                         </div>
-                                        <div class="mb-3 col-lg-6">
+                                        <div class="mb-3 col-lg-4">
                                             <label for="password" class="form-label">Password</label>
                                             <input type="text" class="form-control" id="password" name="password">
+                                        </div>
+                                        <div class="mb-3 col-lg-4">
+                                            <label for="password" class="form-label">ID Karyawan</label>
+                                            <input type="text" class="form-control" id="password" name="employee_id" value="{{ $user->employee_id }}">
                                         </div>
                                     </div>
                                     <div class="mb-3">

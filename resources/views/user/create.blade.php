@@ -34,17 +34,24 @@
                                     </div>
                                     <div class="mb-3">
                                         <div class="row">
-                                            <div class="col-lg-6">
+                                            <div class="col-lg-4">
+                                                <label class="form-label">ID Karyawan</label>
+                                                <input type="text" class="form-control" id="password" name="employee_id"
+                                                    required>
+                                            </div>
+                                            <div class="col-lg-4">
                                                 <label for="area_id" class="form-label col-lg-12 ">Area</label>
                                                 <select class="custom-select col-lg-12 adduserarea" name="area_id"
                                                     id="area_id" required>
                                                     <option value="">--Choose Area--</option>
                                                     @foreach ($areas as $area)
-                                                        <option value="{{ $area->id }}" {{ $area->name == 'STAFF' ? 'selected' : '' }}>{{ $area->name }}</option>
+                                                        <option value="{{ $area->id }}"
+                                                            {{ $area->name == 'STAFF' ? 'selected' : '' }}>
+                                                            {{ $area->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-lg-6">
+                                            <div class="col-lg-4">
                                                 <label for="divisi_id" class="form-label col-lg-12">Divisi</label>
                                                 <select class="custom-select col-lg-12 adduserdivisi" id="divisi_id"
                                                     name="divisi_id" required>
@@ -86,7 +93,8 @@
                                         <div class="row">
                                             <div class="col-lg-3">
                                                 <label for="dr" class="form-label col-lg-12">Daily Result</label>
-                                                <select class="custom-select col-lg-12" id="dr" name="dr" required>
+                                                <select class="custom-select col-lg-12" id="dr" name="dr"
+                                                    required>
                                                     <option value="1" selected>YES</option>
                                                     <option value="0">NO</option>
                                                 </select>
@@ -97,28 +105,32 @@
                                         <div class="row">
                                             <div class="col-lg-3">
                                                 <label for="wn" class="form-label col-lg-12">Weekly Non</label>
-                                                <select class="custom-select col-lg-12" id="wn" name="wn" required>
+                                                <select class="custom-select col-lg-12" id="wn" name="wn"
+                                                    required>
                                                     <option value="1" selected>YES</option>
                                                     <option value="0">NO</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-3">
                                                 <label for="wr" class="form-label col-lg-12">Weekly Result</label>
-                                                <select class="custom-select col-lg-12" id="wr" name="wr" required>
+                                                <select class="custom-select col-lg-12" id="wr" name="wr"
+                                                    required>
                                                     <option value="1" selected>YES</option>
                                                     <option value="0">NO</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-3">
                                                 <label for="mn" class="form-label col-lg-12">Monthly Non</label>
-                                                <select class="custom-select col-lg-12" id="mn" name="mn" required>
+                                                <select class="custom-select col-lg-12" id="mn" name="mn"
+                                                    required>
                                                     <option value="1" selected>YES</option>
                                                     <option value="0">NO</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-3">
                                                 <label for="mr" class="form-label col-lg-12">Monthly Result</label>
-                                                <select class="custom-select col-lg-12" id="mr" name="mr" required>
+                                                <select class="custom-select col-lg-12" id="mr" name="mr"
+                                                    required>
                                                     <option value="1" selected>YES</option>
                                                     <option value="0">NO</option>
                                                 </select>
@@ -126,7 +138,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-12" style="text-align: right;">
-                                        <button type="submit" class="btn btn-success mt-3" style="width: 100%; background-color: #917FB3; border-color: #917FB3;">SAVE</button>
+                                        <button type="submit" class="btn btn-success mt-3"
+                                            style="width: 100%; background-color: #917FB3; border-color: #917FB3;">SAVE</button>
                                     </div>
                                 </form>
                             </div>
