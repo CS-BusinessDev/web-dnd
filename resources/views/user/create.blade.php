@@ -77,7 +77,7 @@
                                             <div class="col-lg-4">
                                                 <label for="approval_id" class="form-label col-lg-12">Approval</label>
                                                 <select class="custom-select col-lg-12 adduserapproval" id="approval_id"
-                                                    name="approval_id" required>
+                                                    name="approval_id">
                                                 </select>
                                             </div>
                                         </div>

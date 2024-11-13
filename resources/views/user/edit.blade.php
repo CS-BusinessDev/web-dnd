@@ -68,8 +68,8 @@
                                             </div>
                                             <div class="col-lg-3">
                                                 <label for="approval_id" class="form-label col-lg-12">Approval</label>
-                                                <select class="custom-select col-lg-12" id="approval_id" name="approval_id"
-                                                    required>
+                                                <select class="custom-select col-lg-12" id="approval_id" name="approval_id">
+                                                    <option value="" {{ is_null($user->approval_id) ? 'selected' : '' }}>--Pilih Approval--</option>
                                                     @foreach ($approvals as $approval)
                                                         <option value="{{ $approval->id }}"
                                                             {{ $approval->id === $user->approval_id ? 'selected' : '' }}>
