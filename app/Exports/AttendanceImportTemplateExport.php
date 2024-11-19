@@ -16,19 +16,24 @@ class AttendanceImportTemplateExport implements FromCollection, WithHeadings
         $currentPeriod = \Carbon\Carbon::now()->format('Y-m'); // Current month in YYYY-MM format
 
         return User::whereNull('deleted_at')
-        ->select('nama_lengkap')
-        ->get()
-        ->map(function ($user) use ($currentPeriod) {
-            return [
-                'nama_lengkap' => $user->nama_lengkap,
-                'periode' => $currentPeriod,
-                'work_days' => '',
-                'late_less_30' => '', // Leave blank
-                'late_more_30' => '', // Leave blank
-                'sick_days' => '',    // Leave blank
-            ];
-        });
-
+            ->when(auth()->user()->id != 1161, function ($query) {
+                // Jika role_id bukan 2 atau 3, filter berdasarkan approval_id
+                if (auth()->user()->role_id != 2 && auth()->user()->role_id != 3) {
+                    $query->where('approval_id', auth()->id());
+                }
+            })
+            ->select('nama_lengkap')
+            ->get()
+            ->map(function ($user) use ($currentPeriod) {
+                return [
+                    'nama_lengkap' => $user->nama_lengkap,
+                    'periode' => $currentPeriod,
+                    'work_days' => '', // Leave blank
+                    'late_less_30' => '', // Leave blank
+                    'late_more_30' => '', // Leave blank
+                    'sick_days' => '',    // Leave blank
+                ];
+            });
     }
 
     /**

@@ -48,6 +48,7 @@ class UsersImport implements ToModel, WithHeadingRow
             if ($user) {
                 // Update existing user
                 $user->update([
+                    'employee_id' => $row['id_karyawan'],
                     'role_id' => $role->id,
                     'area_id' => $area->id,
                     'divisi_id' => $divisi->id,
@@ -56,7 +57,7 @@ class UsersImport implements ToModel, WithHeadingRow
                     'wr' => strtoupper($row['wr']) == 'YES',
                     'mn' => strtoupper($row['mn']) == 'YES',
                     'mr' => strtoupper($row['mr']) == 'YES',
-                    'approval_id' => $approval ? $approval->id : 1,
+                    'approval_id' => $approval ? $approval->id : null,
                     'position_id' => $row['position_id'],
                 ]);
             } else {
@@ -64,6 +65,7 @@ class UsersImport implements ToModel, WithHeadingRow
                 return new User([
                     'nama_lengkap' => strtoupper($row['nama_lengkap']),
                     'username' => $username,
+                    'employee_id' => $row['id_karyawan'],
                     'role_id' => $role->id,
                     'area_id' => $area->id,
                     'divisi_id' => $divisi->id,
@@ -72,7 +74,7 @@ class UsersImport implements ToModel, WithHeadingRow
                     'wr' => strtoupper($row['wr']) == 'YES',
                     'mn' => strtoupper($row['mn']) == 'YES',
                     'mr' => strtoupper($row['mr']) == 'YES',
-                    'approval_id' => $approval ? $approval->id : 1,
+                    'approval_id' => $approval ? $approval->id : null,
                     'position_id' => $row['position_id'],
                     'password' => $row['password'] ? bcrypt($row['password']) : bcrypt('complete123'),
                 ]);

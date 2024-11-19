@@ -56,17 +56,14 @@
                              <p>My Team</p>
                          </a>
                      </li>
-                 @endif
-
-                 @if (auth()->user()->id == 1161)
-                 <li class="nav-item">
+                      <li class="nav-item">
                     <a href="/attendance" class="nav-link {{ $active === 'attendance' ? 'active' : '' }}"
                         style="{{ $active === 'attendance' ? 'background-color: #917FB3; color: white;' : '' }}">
                         <i class="nav-icon fas fa-clock"></i>
                         <p>Attendance</p>
                     </a>
                 </li>
-                @endauth
+                 @endif
 
                 @if (auth()->user()->role_id == 1)
                  <li class="nav-item">

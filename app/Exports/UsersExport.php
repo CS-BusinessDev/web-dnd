@@ -14,7 +14,10 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
-        return User::with('approval', 'area', 'role', 'divisi')->orderBy('nama_lengkap')->get();
+        return User::with('approval', 'area', 'position', 'role', 'divisi')
+            ->whereNull('deleted_at') // Hanya mengambil data yang tidak dihapus
+            ->orderBy('nama_lengkap')
+            ->get();
     }
 
     public function headings(): array
@@ -22,6 +25,8 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping
         return [
             'nama_lengkap',
             'username',
+            'id_karyawan',
+            'position',
             'role',
             'area',
             'divisi',
@@ -39,6 +44,8 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping
         return [
             $user->nama_lengkap,
             $user->username,
+            $user->employee_id ?? null,
+            $user->position->name ?? null,
             $user->role->name,
             $user->area->name,
             $user->divisi->name,
