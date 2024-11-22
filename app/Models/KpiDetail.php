@@ -18,7 +18,7 @@ class KpiDetail extends Model
         'created_at',
         'updated_at',
         'deleted_at',
-    ];   
+    ];
 
     public function kpi()
     {
@@ -28,5 +28,10 @@ class KpiDetail extends Model
     public function kpi_description()
     {
         return $this->belongsTo(KpiDescription::class);
+    }
+
+    public function children()
+    {
+        return $this->hasMany(KpiDetail::class, 'parent_id');
     }
 }

@@ -163,6 +163,93 @@ class KpiDashboardController extends Controller
         ]);
     }
 
+    // public function indexMonthly(Request $request)
+    // {
+    //     $currentMonth = Carbon::now()->month;
+    //     $currentYear = Carbon::now()->year;
+
+    //     $kpis = Kpi::with(['kpi_detail.children', 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user'])
+    //         ->where('user_id', auth()->user()->id)
+    //         ->where('kpi_type_id', 3)
+    //         ->whereMonth('date', $currentMonth)
+    //         ->whereYear('date', $currentYear)
+    //         ->orderBy('date', 'DESC')
+    //         ->get();
+
+
+    //     if ($request->month) {
+    //         $date = Carbon::createFromFormat('m/Y', $request->month);
+
+    //         $kpisQuery = Kpi::with(['kpi_detail' => function ($query) {
+    //             $query->where('is_extra_task', 0);
+    //         }, 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user'])
+    //             ->where('kpi_type_id', 3)
+    //             ->whereMonth('date', $date->month)
+    //             ->whereYear('date', $date->year);
+
+    //         $user_id = $request->input('user_id');
+
+    //         if ($user_id) {
+    //             $kpisQuery->where('user_id', $user_id);
+    //         } else {
+    //             $kpisQuery->where('user_id', auth()->user()->id);
+    //         }
+
+    //         $kpis = $kpisQuery->orderBy('date', 'DESC')->get();
+    //     }
+
+    //     // Group the KPIs by yearly month
+    //     $groupedKpisByYear = $kpis->groupBy(function ($kpi) {
+    //         return CarbonImmutable::parse($kpi->date)->format('Y-m');
+    //     });
+
+    //     // Group the KPIs by KPI category within each month group
+    //     $groupedKpisByYearAndCategory = [];
+    //     $totalScore = 0;
+    //     $averageTotalScore = 0;
+
+    //     foreach ($groupedKpisByYear as $yearMonth => $groupedKpi) {
+    //         $groupedKpiByCategory = $groupedKpi->groupBy('kpi_category.name');
+
+    //         $groupedKpiByCategory = $groupedKpiByCategory->sortBy(function ($kpis, $categoryName) {
+    //             $categoryOrder = ['MAIN JOB', 'ADMINISTRATION', 'REPORTING'];
+    //             $categoryIndex = array_search($categoryName, $categoryOrder);
+    //             return $categoryIndex !== false ? $categoryIndex : count($categoryOrder);
+    //         });
+
+    //         $groupedKpisByYearAndCategory[$yearMonth] = $groupedKpiByCategory;
+
+    //         foreach ($groupedKpiByCategory as $categoryName => $kpis) {
+    //             foreach ($kpis as $kpi) {
+    //                 foreach ($kpi->kpi_detail as $kpiDetail) {
+    //                     // Ambil semua ekstra tugas yang terkait
+    //                     $extraTasks = KpiDetail::where('parent_id', $kpiDetail->id)->get();
+
+    //                     // Tambahkan nilai ekstra tugas ke nilai aktual
+    //                     $extraTaskTotal = $extraTasks->sum('value_actual');
+    //                     $kpiDetail->value_actual += $extraTaskTotal;
+
+    //                     // Perbarui nilai hasil setelah menambahkan ekstra tugas
+    //                     if ($kpiDetail->value_plan > 0) {
+    //                         $kpiDetail->value_result = ($kpiDetail->value_actual / $kpiDetail->value_plan) * 100;
+    //                     } else {
+    //                         $kpiDetail->value_result = 0; // Default jika tidak ada value_plan
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return view('kpi.kpi_dashboard.index_monthly', [
+    //         'title' => 'KPI Dashboard',
+    //         'active' => 'kpi-dashboard',
+    //         'groupedKpis' => $groupedKpisByYearAndCategory,
+    //         'totalScore' => $totalScore,
+    //         'users' => $this->getUser(),
+    //         'divisions' => Divisi::all(),
+    //     ]);
+    // }
+
     public function indexMonthly(Request $request)
     {
         $currentMonth = Carbon::now()->month;

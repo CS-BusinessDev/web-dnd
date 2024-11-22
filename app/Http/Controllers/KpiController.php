@@ -35,8 +35,8 @@ class KpiController extends Controller
                 ->simplePaginate(100);
 
             $positions = Position::whereHas('user', function ($q) {
-                    $q->where('divisi_id', auth()->user()->divisi_id);
-                })
+                $q->where('divisi_id', auth()->user()->divisi_id);
+            })
                 ->get();
         } else {
             $kpis = Kpi::orderBy('date', 'DESC')
@@ -49,31 +49,31 @@ class KpiController extends Controller
             $kpis = Kpi::whereHas('user', function ($q) use ($request) {
                 $q->where('position_id', $request->position_id);
             })
-            ->orderBy('date', 'DESC')
-            ->get();
+                ->orderBy('date', 'DESC')
+                ->get();
         }
 
         // BU VEGA
         if (auth()->user()->role_id == 5 && auth()->user()->divisi_id == 3) {
             $positionsToCopy = Position::whereHas('user', function ($q) {
-                $q->whereIn('role_id', [4,5,3,2])
-                ->where('divisi_id', auth()->user()->divisi_id);
+                $q->whereIn('role_id', [4, 5, 3, 2])
+                    ->where('divisi_id', auth()->user()->divisi_id);
             })
-            ->get();
-        // KALAU ROLE MANAGER BUAT KPI UNTUK ROLE COORDINATOR & MANAGER
+                ->get();
+            // KALAU ROLE MANAGER BUAT KPI UNTUK ROLE COORDINATOR & MANAGER
         } else if (auth()->user()->role_id == 5 && auth()->user()->divisi_id != 3) {
             $positionsToCopy = Position::whereHas('user', function ($q) {
-                $q->whereIn('role_id', [4,5])
-                ->where('divisi_id', auth()->user()->divisi_id);
+                $q->whereIn('role_id', [4, 5])
+                    ->where('divisi_id', auth()->user()->divisi_id);
             })
-            ->get();
-        // KALAU ROLE COORDINATOR BUAT KPI UNTUK ROLE COORDINATOR & TEAM LEADER & STAFF
+                ->get();
+            // KALAU ROLE COORDINATOR BUAT KPI UNTUK ROLE COORDINATOR & TEAM LEADER & STAFF
         } else if (auth()->user()->role_id == 4) {
             $positionsToCopy = Position::whereHas('user', function ($q) {
-                $q->whereIn('role_id', [4,3,2])
-                ->where('divisi_id', auth()->user()->divisi_id);
+                $q->whereIn('role_id', [4, 3, 2])
+                    ->where('divisi_id', auth()->user()->divisi_id);
             })
-            ->get();
+                ->get();
         } else {
             $positionsToCopy = Position::with('user')->get();
         }
@@ -110,24 +110,24 @@ class KpiController extends Controller
         // BU VEGA
         if (auth()->user()->role_id == 5 && auth()->user()->divisi_id == 3) {
             $positions = Position::whereHas('user', function ($q) {
-                $q->whereIn('role_id', [4,5,3,2])
-                ->where('divisi_id', auth()->user()->divisi_id);
+                $q->whereIn('role_id', [4, 5, 3, 2])
+                    ->where('divisi_id', auth()->user()->divisi_id);
             })
-            ->get();
-        // KALAU ROLE MANAGER BUAT KPI UNTUK ROLE COORDINATOR & MANAGER
+                ->get();
+            // KALAU ROLE MANAGER BUAT KPI UNTUK ROLE COORDINATOR & MANAGER
         } else if (auth()->user()->role_id == 5 && auth()->user()->divisi_id != 3) {
             $positions = Position::whereHas('user', function ($q) {
-                $q->whereIn('role_id', [4,5])
-                ->where('divisi_id', auth()->user()->divisi_id);
+                $q->whereIn('role_id', [4, 5])
+                    ->where('divisi_id', auth()->user()->divisi_id);
             })
-            ->get();
-        // KALAU ROLE COORDINATOR BUAT KPI UNTUK ROLE COORDINATOR & TEAM LEADER & STAFF
+                ->get();
+            // KALAU ROLE COORDINATOR BUAT KPI UNTUK ROLE COORDINATOR & TEAM LEADER & STAFF
         } else if (auth()->user()->role_id == 4) {
             $positions = Position::whereHas('user', function ($q) {
-                $q->whereIn('role_id', [4,3,2])
-                ->where('divisi_id', auth()->user()->divisi_id);
+                $q->whereIn('role_id', [4, 3, 2])
+                    ->where('divisi_id', auth()->user()->divisi_id);
             })
-            ->get();
+                ->get();
         } else {
             $positions = Position::with('user')->get();
         }
@@ -350,17 +350,18 @@ class KpiController extends Controller
                 // Check if $kpiDescriptionId exists in the list of existing KpiDescriptions before the update
                 if (in_array($kpiDescriptionId, $existingKpiDescriptionsBeforeUpdate)) {
                     KpiDetail::where('kpi_description_id', $kpiDescriptionId)
-                    ->where('kpi_id', $kpi->id)
-                    ->update($kpiDetailData);
+                        ->where('kpi_id', $kpi->id)
+                        ->update($kpiDetailData);
 
                     KpiDescription::where('id', $kpiDescriptionId)
-                    ->update(['description' => $kpiDescription]);
-
+                        ->update(['description' => $kpiDescription]);
                 } else {
                     // Find or create the KpiDescription
                     $newKpiDescription = KpiDescription::create(
-                        ['description' => $kpiDescription,
-                        'kpi_category_id' => $request->kpi_category_id]
+                        [
+                            'description' => $kpiDescription,
+                            'kpi_category_id' => $request->kpi_category_id
+                        ]
                     );
 
                     // KpiDescription doesn't exist, create a new KpiDetail record
@@ -394,9 +395,9 @@ class KpiController extends Controller
                     ->delete();
             }
 
-            return redirect('kpi/'.$kpi->id.'/show')->with('success', 'Data Updated !');
+            return redirect('kpi/' . $kpi->id . '/show')->with('success', 'Data Updated !');
         } catch (Exception $e) {
-            return redirect('kpi/'.$kpi->id.'/show')->with(['error' => $e->getMessage()]);
+            return redirect('kpi/' . $kpi->id . '/show')->with(['error' => $e->getMessage()]);
         }
     }
 
@@ -453,19 +454,22 @@ class KpiController extends Controller
         return redirect('kpi')->with(['success' => 'Successfully Uploaded !']);
     }
 
-    public function exportMonthly(Request $request){
+    public function exportMonthly(Request $request)
+    {
         $divisi = Divisi::where('id', $request->divisi_id)->first();
 
-        return Excel::download(new KpiMonthlyExport($request->date, $request->divisi_id ?? auth()->user()->divisi_id), 'KPI_'. (auth()->user()->role_id == 1 ? $divisi->name : auth()->user()->divisi->name) . '_' . $request->date . '.xlsx');
+        return Excel::download(new KpiMonthlyExport($request->date, $request->divisi_id ?? auth()->user()->divisi_id), 'KPI_' . (auth()->user()->role_id == 1 ? $divisi->name : auth()->user()->divisi->name) . '_' . $request->date . '.xlsx');
     }
 
-    public function exportPerDivision(Request $request){
+    public function exportPerDivision(Request $request)
+    {
         $divisi = Divisi::where('id', $request->divisi_id)->first();
 
-        return Excel::download(new KpiPerDivisionExport($request->month, $request->divisi_id ?? auth()->user()->divisi_id), 'KPI_'. (auth()->user()->role_id == 1 ? $divisi->name : auth()->user()->divisi->name) . '_' . $request->month . '.xlsx');
+        return Excel::download(new KpiPerDivisionExport($request->month, $request->divisi_id ?? auth()->user()->divisi_id), 'KPI_' . (auth()->user()->role_id == 1 ? $divisi->name : auth()->user()->divisi->name) . '_' . $request->month . '.xlsx');
     }
 
-    public function copyKpi(Request $request){
+    public function copyKpi(Request $request)
+    {
         $fromDate = Carbon::createFromFormat('m/Y', $request->fromDate)->startOfMonth();
         $toDate = Carbon::createFromFormat('m/Y', $request->toDate)->startOfMonth();
         $users = User::where('position_id', $request->copy_position_id)->pluck('id');
@@ -492,5 +496,63 @@ class KpiController extends Controller
         }
 
         return redirect('kpi')->with(['success' => 'Copying success !']);
+    }
+
+
+    public function storeExtraTask(Request $request)
+    {
+        // \Log::info('Request Data:', $request->all());
+
+        $request->validate([
+            'parent_id' => 'required|exists:kpi_details,id',
+            'description' => 'required|string',
+            'value_actual' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            // Buat deskripsi di tabel kpi_descriptions
+            $kpiDescription = KpiDescription::create([
+                'description' => $request->description,
+                'kpi_category_id' => KpiDetail::find($request->parent_id)->kpi->kpi_category_id,
+            ]);
+
+            // Buat ekstra task di tabel kpi_details
+            KpiDetail::create([
+                'parent_id' => $request->parent_id,
+                'is_extra_task' => 1,
+                'value_actual' => $request->value_actual,
+                'kpi_description_id' => $kpiDescription->id,
+                'kpi_id' => KpiDetail::find($request->parent_id)->kpi_id,
+            ]);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function destroyExtraTask($id)
+    {
+        try {
+            // Cari data extra task berdasarkan ID
+            $extraTask = KpiDetail::findOrFail($id);
+
+            // Pastikan data yang dihapus adalah ekstra task
+            if ($extraTask->is_extra_task == 1) {
+                // Hapus kpi_description terkait, jika ada
+                if ($extraTask->kpi_description_id) {
+                    $extraTask->kpi_description->delete(); // Hapus kpi_description
+                }
+
+                // Hapus data extra task
+                $extraTask->delete();
+
+                return response()->json(['success' => true, 'message' => 'Ekstra task dan deskripsi berhasil dihapus.']);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Data bukan ekstra task.'], 400);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus.'], 500);
+        }
     }
 }

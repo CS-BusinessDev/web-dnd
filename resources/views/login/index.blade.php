@@ -86,3 +86,47 @@
 </body>
 
 </html>
+
+{{-- @extends('layouts.pages.guest')
+
+@section('content')
+    <div class="auth-main">
+        <div class="auth-wrapper v1">
+            <form class="auth-form" action="/login" method="POST">
+                @csrf
+                <div class="card my-5">
+                    <div class="card-body">
+                        <div class="text-center mb-5">
+                            <img src="{{ asset('dnd-purple.png') }}" width="100" alt="img">
+                        </div>
+
+                        <!-- Alert for Errors -->
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="floatingInput" id="floatingUsername"
+                                placeholder="User Name" name="username" autofocus>
+                            <label for="floatingUsername">Username</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" placeholder="Password" id="floatingPassword"
+                                name="password">
+                            <label for="floatingPassword">Password</label>
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+@endsection --}}
