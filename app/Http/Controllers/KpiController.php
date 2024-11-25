@@ -498,38 +498,66 @@ class KpiController extends Controller
         return redirect('kpi')->with(['success' => 'Copying success !']);
     }
 
-
     public function storeExtraTask(Request $request)
     {
-        // \Log::info('Request Data:', $request->all());
-
         $request->validate([
             'parent_id' => 'required|exists:kpi_details,id',
-            'description' => 'required|string',
-            'value_actual' => 'required|numeric|min:0',
+            'description' => 'required|string|max:255',
+            'count_type' => 'required|in:NON,RESULT',
+            'value_actual' => 'nullable|numeric|min:0',
         ]);
 
         try {
-            // Buat deskripsi di tabel kpi_descriptions
+            // Ambil detail parent KPI
+            $parentKpiDetail = KpiDetail::findOrFail($request->parent_id);
+
+            // Buat deskripsi baru untuk ekstra task
             $kpiDescription = KpiDescription::create([
                 'description' => $request->description,
-                'kpi_category_id' => KpiDetail::find($request->parent_id)->kpi->kpi_category_id,
+                'kpi_category_id' => $parentKpiDetail->kpi->kpi_category_id,
             ]);
 
-            // Buat ekstra task di tabel kpi_details
-            KpiDetail::create([
-                'parent_id' => $request->parent_id,
+            // Buat detail KPI untuk ekstra task
+            $extraTask = KpiDetail::create([
+                'parent_id' => $parentKpiDetail->id,
                 'is_extra_task' => 1,
-                'value_actual' => $request->value_actual,
+                'value_actual' => $request->count_type === 'RESULT' ? $request->value_actual : null,
+                'count_type' => $request->count_type,
                 'kpi_description_id' => $kpiDescription->id,
-                'kpi_id' => KpiDetail::find($request->parent_id)->kpi_id,
+                'kpi_id' => $parentKpiDetail->kpi_id,
             ]);
+
+            // Update nilai Value_Result pada parent
+            if ($request->count_type === 'NON') {
+                // Jika NON, langsung set Value_Result parent menjadi 1
+                $parentKpiDetail->update([
+                    'value_result' => 1,
+                ]);
+            } elseif ($request->count_type === 'RESULT') {
+                // Jika RESULT, hitung Value_Result baru berdasarkan nilai actual
+                $parentPlanValue = $parentKpiDetail->value_plan ?? 1; // Hindari pembagian dengan 0
+                $newActualValue = $parentKpiDetail->value_actual + $request->value_actual;
+
+                $newValueResult = min($newActualValue / $parentPlanValue, 1); // Maksimum 1
+                $parentKpiDetail->update([
+                    'value_actual' => $newActualValue,
+                    'value_result' => $newValueResult,
+                ]);
+            }
+
+            // Flash message ke session
+            session()->flash('success', 'Ekstra task berhasil ditambahkan dan nilai parent diperbarui.');
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
+            // Flash error ke session
+            session()->flash('error', 'Terjadi kesalahan saat menyimpan ekstra task.');
+
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+
 
     public function destroyExtraTask($id)
     {
@@ -539,6 +567,27 @@ class KpiController extends Controller
 
             // Pastikan data yang dihapus adalah ekstra task
             if ($extraTask->is_extra_task == 1) {
+                // Ambil parent dari extra task
+                $parentKpiDetail = KpiDetail::findOrFail($extraTask->parent_id);
+
+                // Kurangi nilai actual parent jika tipe extra task adalah RESULT
+                if ($extraTask->count_type === 'RESULT') {
+                    $parentActualValue = $parentKpiDetail->value_actual - ($extraTask->value_actual ?? 0);
+                    $parentActualValue = max($parentActualValue, 0); // Pastikan tidak negatif
+                } else {
+                    $parentActualValue = $parentKpiDetail->value_actual; // Tidak ada perubahan untuk NON
+                }
+
+                // Hitung ulang value_result untuk parent
+                $parentPlanValue = $parentKpiDetail->value_plan ?? 1; // Hindari pembagian dengan 0
+                $newValueResult = min($parentActualValue / $parentPlanValue, 1); // Maksimum 1
+
+                // Update parent KPI detail
+                $parentKpiDetail->update([
+                    'value_actual' => $parentActualValue,
+                    'value_result' => $newValueResult,
+                ]);
+
                 // Hapus kpi_description terkait, jika ada
                 if ($extraTask->kpi_description_id) {
                     $extraTask->kpi_description->delete(); // Hapus kpi_description
@@ -547,12 +596,16 @@ class KpiController extends Controller
                 // Hapus data extra task
                 $extraTask->delete();
 
+                session()->flash('success', 'Ekstra task berhasil dihapus dan nilai parent diperbarui.');
+
                 return response()->json(['success' => true, 'message' => 'Ekstra task dan deskripsi berhasil dihapus.']);
             }
 
             return response()->json(['success' => false, 'message' => 'Data bukan ekstra task.'], 400);
         } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan saat menghapus ekstra task.');
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus.'], 500);
         }
     }
+
 }

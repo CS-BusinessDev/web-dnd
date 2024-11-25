@@ -2,7 +2,8 @@
     <div class="float-right d-none d-sm-block">
         <b>Version</b> 2.0.0
     </div>
-    <strong>Copyright &copy; 2023 - 2024 <a href="#" style="color: #917FB3;">BUSINESS DEVELOPMENT</a>.</strong> All rights
+    <strong>Copyright &copy; 2023 - 2024 <a href="#" style="color: #917FB3;">BUSINESS DEVELOPMENT</a>.</strong> All
+    rights
     reserved.
 </footer>
 
@@ -38,7 +39,7 @@
 <!-- datepicker -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.2.0/js/bootstrap-datepicker.min.js"></script>
 <script src="{{ asset('script.js') }}"></script>
-<script src="{{ asset('sw.js') }}"></script>
+{{-- <script src="{{ asset('sw.js') }}"></script>
 <script>
     if ("serviceWorker" in navigator) {
         // Register a service worker hosted at the root of the
@@ -54,7 +55,7 @@
     } else {
         console.error("Service workers are not supported.");
     }
-</script>
+</script> --}}
 @yield('footer')
 </body>
 

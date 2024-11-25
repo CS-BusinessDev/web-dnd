@@ -267,9 +267,9 @@ class KpiDashboardController extends Controller
             $date = Carbon::createFromFormat('m/Y', $request->month);
 
             $kpisQuery = Kpi::with('kpi_detail', 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user')
-                ->where('kpi_type_id', 3)
-                ->whereMonth('date', $date->month)
-                ->whereYear('date', $date->year);
+            ->where('kpi_type_id', 3)
+            ->whereMonth('date', $date->month)
+            ->whereYear('date', $date->year);
 
             $user_id = $request->input('user_id');
 
@@ -280,7 +280,7 @@ class KpiDashboardController extends Controller
             }
 
             $kpis = $kpisQuery->orderBy('date', 'DESC')
-                ->get();
+            ->get();
         }
 
         // Group the KPIs by yearly month
@@ -318,6 +318,7 @@ class KpiDashboardController extends Controller
                         return $kpiDetail->value_result !== null && $kpiDetail->value_result >= 0;
                     });
 
+
                     $actualCount = $kpiDetailWithValue->sum('value_result');
                     $count = $kpiDetailWithValue->count();
 
@@ -329,7 +330,7 @@ class KpiDashboardController extends Controller
                     // If $count is zero, assign a default value of 1 to divisor
                     $divisor = $count > 0 ? $count : 1;
                     $actualCount = $actualCount / $divisor;
-                    $score = ($kpi->percentage / 100) * ($kpiDetailWithValue->sum('value_result') / $kpi->kpi_detail->count());
+                    $score = ($kpi->percentage / 100) * ($kpiDetailWithValue->sum('value_result') / $count);
 
                     // Add the calculated values to the KPI object
                     $kpi->actualCount = $actualCount;
@@ -339,6 +340,7 @@ class KpiDashboardController extends Controller
             }
             // $averageTotalScore = $totalScore / $totalKpiCategories;
         }
+
 
         return view('kpi.kpi_dashboard.index_monthly', [
             'title' => 'KPI Dashboard',

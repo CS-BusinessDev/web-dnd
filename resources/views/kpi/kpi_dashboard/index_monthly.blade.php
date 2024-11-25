@@ -153,17 +153,15 @@
                                                                                     </td>
                                                                                 @elseif ($kpiDetail->count_type === 'RESULT')
                                                                                     <td class="text-center">
-                                                                                        {{ number_format($kpiDetail->value_result, 2) }}%
+                                                                                        {{ number_format($kpiDetail->value_result * 100, 2) }}%
                                                                                     </td>
-                                                                                    @if ($kpiDetail->value_result != 100 && $kpiDetail->value_result != 0)
+                                                                                    @if ($kpiDetail->value_result > 0 && $kpiDetail->value_result < 1)
                                                                                         <td>
-                                                                                            <a class="badge badge-warning btn-sm"
-                                                                                                data-toggle="modal"
-                                                                                                data-target="#extraTaskModal"
-                                                                                                data-parent-id="{{ $kpiDetail->id }}"
-                                                                                                onclick="openExtraTaskModal(this);">
-                                                                                                Ekstra Task
-                                                                                            </a>
+                                                                                            <button
+                                                                                                class="badge badge-warning btn-sm"
+                                                                                                data-id="{{ $kpiDetail->id }}"
+                                                                                                onclick="openExtraTaskModal(this)">Ekstra
+                                                                                                Task</button>
                                                                                         </td>
                                                                                     @endif
                                                                                 @endif
@@ -176,29 +174,25 @@
                                                                                     <td>[Ekstra Task]
                                                                                         {{ $extraTask->kpi_description->description ?? '-' }}
                                                                                     </td>
-                                                                                    <td colspan="4"></td>
+                                                                                    <td></td>
+                                                                                    <td></td>
+                                                                                    <td class="text-center">
+                                                                                        {{ $extraTask->count_type }}</td>
+                                                                                    <td></td>
                                                                                     <td class="text-center">
                                                                                         {{ $extraTask->value_actual }}</td>
                                                                                     <td></td>
                                                                                     <td class="text-center">
-                                                                                        <form
-                                                                                            action="{{ route('extra-task.destroy', $extraTask->id) }}"
-                                                                                            method="POST"
-                                                                                            class="d-inline">
-                                                                                            @csrf
-                                                                                            @method('DELETE')
-                                                                                            <button type="submit"
-                                                                                                class="btn btn-danger btn-sm"
-                                                                                                onclick="return confirm('Yakin ingin menghapus?')">
-                                                                                                Hapus
-                                                                                            </button>
-                                                                                        </form>
+                                                                                        <button type="button"
+                                                                                            class="badge badge-danger btn-sm"
+                                                                                            onclick="deleteExtraTask('{{ $extraTask->id }}')">
+                                                                                            Hapus
+                                                                                        </button>
                                                                                     </td>
                                                                                 </tr>
                                                                             @endforeach
                                                                         @endforeach
                                                                     @endforeach
-
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -247,12 +241,19 @@
                     <div class="modal-body">
                         <input type="hidden" id="parent_id" name="parent_id">
                         <div class="row">
-                            <div class="mb-3 col-lg-6">
-                                <label for="notes" class="form-label">Deskripsi Ekstra Task</label>
+                            <div class="mb-3 col-12">
+                                <label class="form-label">Deskripsi Ekstra Task</label>
                                 <input class="form-control" id="description" name="description">
                             </div>
-                            <div class="mb-3 col-lg-6">
-                                <label for="value_actual" class="form-label">Nilai Aktual</label>
+                            <div class="mb-3 col-12">
+                                <label class="form-label">Count Type</label>
+                                <select name="count_type" class="form-control" id="count_type">
+                                    <option value="NON">NON</option>
+                                    <option value="RESULT">RESULT</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 col-12 d-none" id="value_actual_group">
+                                <label class="form-label">Nilai Aktual</label>
                                 <input type="number" class="form-control" id="value_actual" name="value_actual"
                                     step="0.01">
                             </div>
@@ -267,27 +268,100 @@
         </div>
     </div>
 
+    <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <input type="hidden" id="modalKpiId">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resultModalLabel">Update KPI</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label">KPI Desc</label>
+                            <input type="text" class="form-control" id="modalDescription" disabled>
+                        </div>
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label">Tipe</label>
+                            <input type="text" class="form-control" id="modalCountType" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label">Month</label>
+                            <input type="text" class="form-control" id="modalMonth" readonly>
+                        </div>
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label">Value Plan</label>
+                            <input type="text" class="form-control" id="modalValuePlan" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-lg-6">
+                            <label class="form-label">Value Actual</label>
+                            <input type="number" class="form-control" id="modalValueActual" value="0" required>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success mt-3" onclick="submitResultUpdate()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+@endsection
+
+
+@section('footer')
     <script>
+        // Fungsi untuk Membuka Modal
         function openExtraTaskModal(button) {
-            const parentId = button.getAttribute('data-parent-id');
-            document.getElementById('parent_id').value = parentId; // Set parent_id di modal
+            const parentId = button.getAttribute('data-id');
+            const modal = document.getElementById('extraTaskModal');
+
+            // Set parent_id untuk modal
+            document.getElementById('parent_id').value = parentId;
+
+            // Reset form saat modal dibuka
+            document.getElementById('extraTaskForm').reset();
+            document.getElementById('value_actual_group').classList.add('d-none');
+
+            // Tampilkan modal
+            $(modal).modal('show');
         }
 
+        // Event Listener untuk Dropdown count_type
+        document.addEventListener('change', function(event) {
+            if (event.target && event.target.id === 'count_type') {
+                const countType = event.target.value;
+                const valueActualGroup = document.getElementById('value_actual_group');
+
+                if (countType === 'RESULT') {
+                    valueActualGroup.classList.remove('d-none');
+                } else {
+                    valueActualGroup.classList.add('d-none');
+                }
+            }
+        });
+
+        // Fungsi untuk Submit Ekstra Task
         function submitExtraTask() {
-            const formData = new FormData(document.getElementById('extraTaskForm'));
+            const form = document.getElementById('extraTaskForm');
+            const formData = new FormData(form);
 
             fetch('/extra-task/store', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     },
-                    body: formData
+                    body: formData,
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Ekstra task berhasil ditambahkan!');
+                        // alert('Ekstra task berhasil ditambahkan!');
                         location.reload(); // Refresh halaman
                     } else {
                         alert('Gagal menambahkan ekstra task!');
@@ -296,6 +370,31 @@
                 .catch(error => {
                     console.error('Error:', error);
                     alert('Terjadi kesalahan!');
+                });
+        }
+
+        // Fungsi untuk Menghapus Ekstra Task
+        function deleteExtraTask(extraTaskId) {
+            if (!confirm('Yakin ingin menghapus?')) return;
+
+            fetch(`/extra-task/${extraTaskId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // alert(data.message);
+                        location.reload(); // Refresh halaman
+                    } else {
+                        alert(data.message || 'Gagal menghapus ekstra task!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat menghapus!');
                 });
         }
     </script>
