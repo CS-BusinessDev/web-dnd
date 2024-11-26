@@ -23,6 +23,7 @@
                                     <!-- <li class="nav-item"><a class="nav-link" href="/dash-daily">Daily</a></li>
                                     <li class="nav-item"><a class="nav-link" href="/dash-weekly">Weekly</a></li> -->
                                     <li class="nav-item"><a class="nav-link" href="/dash-monthly" style="color: #917FB3;">KPI</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/leaderboard" style="color: #917FB3;">Leaderboard</a></li>
                                 </ul>
                             </div>
                             <div class="card-tools">
@@ -314,7 +315,7 @@
                 }
             },
         });
-        
+
     // const highestKpiWeeklyColumnData = [];
     // const highestKpiWeeklyLineData = [];
     // @foreach($highestKpiWeeklyUser as $index => $user)
@@ -322,7 +323,7 @@
     //     name: {!! json_encode($user) !!},
     //     y: {!! json_encode($highestKpiWeeklyUnit[$index]) !!},
     // });
-    
+
     // highestKpiWeeklyLineData.push({
     //     name: {!! json_encode($user) !!},
     //     y: {!! json_encode($highestKpiWeeklyUnit[$index]) !!},
@@ -408,7 +409,7 @@
         name: {!! json_encode($user) !!},
         y: {!! json_encode($highestKpiMonthlyUnit[$index]) !!},
     });
-    
+
     highestKpiMonthlyLineData.push({
         name: {!! json_encode($user) !!},
         y: {!! json_encode($highestKpiMonthlyUnit[$index]) !!},
@@ -468,7 +469,7 @@
                     color: '#b2a5ca',
                 },
                 spline: {
-                    color: '#574c6b' 
+                    color: '#574c6b'
                 }
             },
             series: [
