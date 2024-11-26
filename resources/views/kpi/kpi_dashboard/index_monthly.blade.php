@@ -27,6 +27,7 @@
                                             style="color: #917FB3;">Dashboard</a></li>
                                     <li class="nav-item"><a class="nav-link active" href="/dash-monthly"
                                             style="background-color: #917FB3;">KPI</a></li>
+                                            <li class="nav-item"><a class="nav-link" href="/leaderboard" style="color: #917FB3;">Leaderboard</a></li>
                                 </ul>
                             </div>
                             <div class="card-tools d-flex align-items-center">
