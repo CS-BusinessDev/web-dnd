@@ -4,7 +4,7 @@
             <div class="col my-1">
                 <p class="m-0">
                     <b>BUSINESS DEVELOPMENT</b>
-                    © 2023 - {{ date('Y') }}
+                    © 2022 - {{ date('Y') }}
                 </p>
             </div>
             <div class="col-auto my-1">

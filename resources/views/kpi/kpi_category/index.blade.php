@@ -1,4 +1,4 @@
-@extends('layout.main_tamplate')
+{{-- @extends('layout.main_tamplate')
 
 @section('content')
     <section class="content-header">
@@ -19,12 +19,8 @@
                         <div class="card-header bg-white">
                             <h3 class="card-title"><strong>KPI Category</strong></h3>
                             <div class="card-tools">
-                                {{-- <a data-toggle="modal" data-target="#addKPICategory" class="btn btn-tool btn-sm">
-                                    <i class="fas fa-plus"></i>
-                                </a> --}}
                             </div>
                         </div>
-                        <!-- /.card-header -->
                         <div class="card-body table-responsive p-0" style="height: 500px;">
                             <table class="table table-striped table-head-fixed text-nowrap">
                                 <thead>
@@ -43,25 +39,18 @@
                                                 <a href="/kpicategory/{{ $kpic->id }}/edit" style="color: orange;">
                                                     <span><i class="fas fa-edit"></i></span>
                                                 </a>
-                                                {{-- <a href="/kpicategory/{{ $kpic->id }}/delete" style="color: red;" onclick="return confirm('Sure to delete data ?')">
-                                                    <span><i class="fas fa-trash"></i></span>
-                                                </a> --}}
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
-                        <!-- /.card-body -->
                     </div>
-                    <!-- /.card -->
-                </div>
+                </div>`
             </div>
         </div>
     </section>
-    <!-- /.content -->
-    <!-- /.content-wrapper -->
-    <!-- Modal Add -->
+
     <div class="modal fade" id="addKPICategory" tabindex="-1" role="dialog" aria-labelledby="addKPICategoryLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -87,4 +76,54 @@
             </div>
         </div>
     </div>
+@endsection --}}
+
+@extends('layouts.pages.dashboard')
+
+@section('content')
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-md-12">
+                    <div class="page-header-title">
+                        <h2 class="mb-0">{{ $title }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card table-card">
+                <div class="card-body pb-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                     <th>No</th>
+                                        <th>Category</th>
+                                        <th style="text-align: right;">More</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($kpiCategories as $kpic)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $kpic->name }}</td>
+                                            <td style="text-align: right;">
+                                                <a href="/kpicategory/{{ $kpic->id }}/edit" style="color: orange;">
+                                                    <span><i class="fas fa-edit"></i></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection

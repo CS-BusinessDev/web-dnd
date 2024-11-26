@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -85,9 +85,9 @@
 
 </body>
 
-</html>
+</html> --}}
 
-{{-- @extends('layouts.pages.guest')
+@extends('layouts.pages.guest')
 
 @section('content')
     <div class="auth-main">
@@ -129,4 +129,4 @@
             </form>
         </div>
     </div>
-@endsection --}}
+@endsection
