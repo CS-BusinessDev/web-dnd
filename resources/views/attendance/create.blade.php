@@ -44,7 +44,8 @@
                                     <div class="form-group">
                                         <label for="periode">Periode (YYYY-MM)</label>
                                         <input type="text" class="form-control" name="periode"
-                                            value="{{ \Carbon\Carbon::now()->format('Y-m') }}" readonly required>
+                                        value="{{ \Carbon\Carbon::now()->day <= 5 ? \Carbon\Carbon::now()->subMonth()->format('Y-m') : \Carbon\Carbon::now()->format('Y-m') }}" readonly required>
+                                        <small class="text-danger">*Jika tanggal hari ini sebelum tanggal 5, periode akan mengacu pada bulan sebelumnya.</small>
                                     </div>
 
                                     <!-- Late Less Than 30 Minutes -->

@@ -1,6 +1,6 @@
-{{-- @extends('layout.main_tamplate') --}}
+@extends('layout.main_tamplate')
 
-{{-- @section('content')
+@section('content')
     <section class="content-header">
         <!-- Konten Utama -->
         <section class="content">
@@ -134,9 +134,9 @@
             </div>
         </div>
     </div>
-@endsection --}}
+@endsection
 
-@extends('layouts.pages.dashboard')
+{{-- @extends('layouts.pages.dashboard')
 
 @section('content')
     <div class="page-header">
@@ -296,4 +296,4 @@
             });
         }
     </script>
-@endsection
+@endsection --}}

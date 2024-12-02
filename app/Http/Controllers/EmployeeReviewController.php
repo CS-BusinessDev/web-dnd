@@ -147,7 +147,16 @@ class EmployeeReviewController extends Controller
         $title = 'My Team';
         $active = 'my_team';
 
-        $currentPeriod = \Carbon\Carbon::now()->format('Y-m');
+        // Cek tanggal sekarang untuk menentukan periode
+        $currentDate = \Carbon\Carbon::now();
+        $currentPeriod = $currentDate->month;
+
+        // Jika tanggal kurang dari 5, set periode ke bulan sebelumnya
+        if ($currentDate->day < 5) {
+            $currentPeriod = $currentDate->subMonth()->format('Y-m');  // Mengambil bulan sebelumnya
+        } else {
+            $currentPeriod = $currentDate->format('Y-m');  // Mengambil bulan saat ini
+        }
 
         // Get employees under the current user's approval with no soft-deletes
         $employees = User::with('position')

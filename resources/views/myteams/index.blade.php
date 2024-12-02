@@ -75,7 +75,7 @@
                                                                 <i class="fas fa-plus"></i> Tambah Review
                                                             </button>
                                                         @else
-                                                            <span class="badge badge-secondary">Review sudah ada</span>
+                                                            <span class="badge badge-secondary">Review sudah ada periode {{ \Carbon\Carbon::now()->day <= 5 ? \Carbon\Carbon::now()->subMonth()->format('Y-m') : \Carbon\Carbon::now()->format('Y-m') }}</span>
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -139,7 +139,8 @@
                         <div class="form-group">
                             <label for="periode">Periode (YYYY-MM)</label>
                             <input type="text" name="periode" class="form-control"
-                                value="{{ \Carbon\Carbon::now()->format('Y-m') }}" readonly>
+                            value="{{ \Carbon\Carbon::now()->day <= 5 ? \Carbon\Carbon::now()->subMonth()->format('Y-m') : \Carbon\Carbon::now()->format('Y-m') }}" readonly>
+                            <small class="text-danger">*Jika tanggal hari ini sebelum tanggal 5, periode akan mengacu pada bulan sebelumnya.</small>
                         </div>
 
                         <!-- Responsiveness Slider -->
