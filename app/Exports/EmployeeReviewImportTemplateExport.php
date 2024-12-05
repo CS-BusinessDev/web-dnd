@@ -5,9 +5,10 @@ namespace App\Exports;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class EmployeeReviewImportTemplateExport implements FromCollection, WithHeadings
+class EmployeeReviewImportTemplateExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
     public function collection()
     {
@@ -17,10 +18,11 @@ class EmployeeReviewImportTemplateExport implements FromCollection, WithHeadings
             ->when(auth()->user()->role !== 'admin', function ($query) {
                 return $query->where('approval_id', Auth::id());
             })
-            ->select('nama_lengkap')
+            ->select('employee_id','nama_lengkap')
             ->get()
             ->map(function ($user) use ($currentPeriod) {
                 return [
+                    'employee_id' => $user->employee_id,
                     'nama_lengkap' => $user->nama_lengkap,
                     'periode' => $currentPeriod,
                     'responsiveness' => '',
@@ -37,6 +39,7 @@ class EmployeeReviewImportTemplateExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'ID karyawan',
             'Nama Lengkap',
             'Periode',
             'Responsiveness',

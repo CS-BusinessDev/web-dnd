@@ -18,16 +18,34 @@ class AttendanceImport implements ToModel, WithHeadingRow
 
     public function __construct()
     {
-        // Cache semua pengguna untuk menghindari query database berulang
+        // Cache semua pengguna berdasarkan 'nama_lengkap' dan 'employee_id' untuk menghindari query database berulang
         $this->usersCache = User::pluck('id', 'nama_lengkap')->toArray();
+        $employeeCache = User::pluck('id', 'employee_id')->toArray();
+
+        // Gabungkan cache berdasarkan 'nama_lengkap' dan 'employee_id'
+        $this->usersCache = array_merge($this->usersCache, $employeeCache);
     }
 
     public function model(array $row)
     {
         Log::info('Data baris: ', $row);
 
-        // Temukan user_id berdasarkan nama_lengkap dari cache
-        $userId = $this->usersCache[$row['nama_lengkap']] ?? null;
+        // Cek apakah ada employee_id, jika ada gunakan employee_id untuk mencari userId, jika tidak, gunakan nama_lengkap
+        $userId = null;
+
+        // Prioritaskan pencarian berdasarkan employee_id terlebih dahulu
+        if (!empty($row['id_karyawan']) && isset($this->usersCache[$row['id_karyawan']])) {
+            // Jika id_karyawan ada, cari berdasarkan employee_id
+            $userId = $this->usersCache[$row['id_karyawan']];
+        }
+
+        // Jika tidak ditemukan berdasarkan id_karyawan, coba cari berdasarkan nama_lengkap
+        if (is_null($userId) && !empty($row['nama_lengkap']) && isset($this->usersCache[$row['nama_lengkap']])) {
+            // Jika nama_lengkap ada, cari berdasarkan nama_lengkap
+            $userId = $this->usersCache[$row['nama_lengkap']];
+        }
+
+        // Proses periode
         $periode = null;
 
         try {
@@ -44,7 +62,9 @@ class AttendanceImport implements ToModel, WithHeadingRow
             Log::error("Kesalahan saat parsing Periode: " . $e->getMessage());
         }
 
+        // Validasi userId dan periode sebelum memproses lebih lanjut
         if ($userId && $periode) {
+            // Cek apakah absensi untuk userId dan periode sudah ada
             $existingAttendance = Attendance::where('user_id', $userId)
                 ->where('periode', $periode)
                 ->exists();
@@ -55,6 +75,7 @@ class AttendanceImport implements ToModel, WithHeadingRow
                 // Simpan detail data yang dilewati
                 $this->skippedDetails[] = [
                     'nama_lengkap' => $row['nama_lengkap'],
+                    'employee_id' => $row['id_karyawan'],
                     'periode' => $periode,
                 ];
 
@@ -73,11 +94,12 @@ class AttendanceImport implements ToModel, WithHeadingRow
             ]);
         }
 
-        Log::error('Import Attendance: Pengguna tidak ditemukan atau gagal parsing Periode untuk nama_lengkap ' . $row['nama_lengkap']);
+        Log::error('Import Attendance: Pengguna tidak ditemukan atau gagal parsing Periode untuk nama_lengkap ' . $row['nama_lengkap'] . ' atau id_karyawan ' . $row['id_karyawan']);
 
         // Simpan detail data yang dilewati jika pengguna tidak ditemukan atau periode tidak valid
         $this->skippedDetails[] = [
             'nama_lengkap' => $row['nama_lengkap'],
+            'employee_id' => $row['id_karyawan'],
             'periode' => $row['periode'] ?? 'Tidak diketahui',
         ];
 

@@ -5,8 +5,9 @@ namespace App\Exports;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class AttendanceImportTemplateExport implements FromCollection, WithHeadings
+class AttendanceImportTemplateExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
     /**
      * Fetch data for export: only users' full names and current period.
@@ -16,22 +17,20 @@ class AttendanceImportTemplateExport implements FromCollection, WithHeadings
         $currentPeriod = \Carbon\Carbon::now()->format('Y-m'); // Current month in YYYY-MM format
 
         return User::whereNull('deleted_at')
-            ->when(auth()->user()->id != 1161, function ($query) {
-                // Jika role_id bukan 2 atau 3, filter berdasarkan approval_id
-                if (auth()->user()->role_id != 2 && auth()->user()->role_id != 3) {
-                    $query->where('approval_id', auth()->id());
-                }
-            })
-            ->select('nama_lengkap')
+            ->select('employee_id', 'nama_lengkap')
             ->get()
+            ->filter(function ($user) {
+                return $user->nama_lengkap !== 'ADMIN'; // Exclude users with 'nama_lengkap' as 'ADMIN'
+            })
             ->map(function ($user) use ($currentPeriod) {
                 return [
+                    'employee_id' => $user->employee_id,
                     'nama_lengkap' => $user->nama_lengkap,
                     'periode' => $currentPeriod,
-                    'work_days' => '', // Leave blank
-                    'late_less_30' => '', // Leave blank
-                    'late_more_30' => '', // Leave blank
-                    'sick_days' => '',    // Leave blank
+                    'work_days' => '',
+                    'late_less_30' => '',
+                    'late_more_30' => '',
+                    'sick_days' => '',
                 ];
             });
     }
@@ -42,6 +41,7 @@ class AttendanceImportTemplateExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'ID karyawan',
             'Nama Lengkap',
             'Periode',
             'Hari Kerja',
