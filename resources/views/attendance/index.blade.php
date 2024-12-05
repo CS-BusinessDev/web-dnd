@@ -50,11 +50,7 @@
                                         data-placement="top" title="Download Template">
                                         <i class="fas fa-file-alt" style="color: white"></i>
                                     </a>
-                                    <a href="{{ route('attendance.export') }}" class="btn btn-success" data-toggle="tooltip"
-                                        data-placement="top" title="Export">
-                                        <i class="fas fa-file-alt" style="color: white"></i>
-                                    </a>
-
+                                    <a href="{{ route('attendance.export') }}">Export</a>
                                 </div>
                             </div>
 

@@ -17,6 +17,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WeeklyController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use App\Models\Attendance;
 use App\Models\KpiDescription;
 use App\Models\Position;
 use Illuminate\Support\Facades\Auth;
@@ -138,12 +139,12 @@ Route::middleware('auth')->group(
 
         Route::get('/teams', [EmployeeReviewController::class, 'myTeam']);
         Route::get('/attendance/download', [EmployeeReviewController::class, 'downloadTeams']);
+        Route::get('attendance/export', [AttendanceController::class, 'exportAttendance'])->name('attendance.export');
 
         ##ROUTE ATTENDANCE
         Route::resource('attendance', AttendanceController::class);
         Route::post('attendance/import', [AttendanceController::class, 'import'])->name('attendance.import');
-        Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');;
-        Route::get('/attendance/download', [AttendanceController::class, 'download']);
+        Route::get('attendance/download', [AttendanceController::class, 'download']);
 
         ##ROUTE EMPLOYEE REVIEW
         Route::get('employee_reviews/download', [EmployeeReviewController::class, 'download']);

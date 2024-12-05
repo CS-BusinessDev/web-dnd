@@ -171,7 +171,7 @@ class AttendanceController extends Controller
         return Excel::download(new AttendanceImportTemplateExport, $fileName);
     }
 
-    public function export()
+    public function exportAttendance()
     {
         return Excel::download(new AttendanceExport(), 'attendance_data.xlsx');
     }
