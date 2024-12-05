@@ -137,12 +137,12 @@ Route::middleware('auth')->group(
         Route::post('/kpi/copy', [KpiController::class, 'copyKpi']);
 
         Route::get('/teams', [EmployeeReviewController::class, 'myTeam']);
-
         Route::get('/attendance/download', [EmployeeReviewController::class, 'downloadTeams']);
 
         ##ROUTE ATTENDANCE
         Route::resource('attendance', AttendanceController::class);
         Route::post('attendance/import', [AttendanceController::class, 'import'])->name('attendance.import');
+        Route::get('/attendance/export', [AttendanceController::class, 'export'])->name('attendance.export');;
         Route::get('/attendance/download', [AttendanceController::class, 'download']);
 
         ##ROUTE EMPLOYEE REVIEW
