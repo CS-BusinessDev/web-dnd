@@ -5,11 +5,12 @@ namespace App\Exports;
 use App\Models\Attendance;
 use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class AttendanceExport implements FromCollection, WithHeadings, WithMapping, WithTitle
+class AttendanceExport implements FromCollection, WithHeadings, WithMapping, WithTitle, ShouldAutoSize
 {
     /**
      * Mengambil data koleksi untuk ekspor
