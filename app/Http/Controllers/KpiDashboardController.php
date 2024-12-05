@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\LeaderboardExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Area;
 use App\Models\Divisi;
 use App\Models\Kpi;
@@ -267,9 +269,9 @@ class KpiDashboardController extends Controller
             $date = Carbon::createFromFormat('m/Y', $request->month);
 
             $kpisQuery = Kpi::with('kpi_detail', 'kpi_detail.kpi_description', 'kpi_type', 'kpi_category', 'user')
-            ->where('kpi_type_id', 3)
-            ->whereMonth('date', $date->month)
-            ->whereYear('date', $date->year);
+                ->where('kpi_type_id', 3)
+                ->whereMonth('date', $date->month)
+                ->whereYear('date', $date->year);
 
             $user_id = $request->input('user_id');
 
@@ -280,7 +282,7 @@ class KpiDashboardController extends Controller
             }
 
             $kpis = $kpisQuery->orderBy('date', 'DESC')
-            ->get();
+                ->get();
         }
 
         // Group the KPIs by yearly month
@@ -963,5 +965,131 @@ class KpiDashboardController extends Controller
         $areas = Area::all();
 
         return view('kpi.kpi_dashboard.leaderboard', compact('title', 'active', 'leaderboardData', 'divisions', 'areas'));
+    }
+
+    public function export(Request $request)
+    {
+        // Ambil filter dari request
+        $selectedPeriod = $request->month ? $request->month : Carbon::now()->format('Y-m');
+        $divisionId = $request->division;
+        $areaId = $request->area;
+
+        $leaderboardData = [];
+
+        $userQuery = User::with([
+            'role',
+            'divisi',
+            'area',
+            'attendance' => function ($query) use ($selectedPeriod) {
+                $query->select('user_id', 'late_less_30', 'late_more_30', 'sick_days', 'work_days', 'periode')
+                    ->where('periode', $selectedPeriod);
+            },
+            'employeeReview' => function ($query) use ($selectedPeriod) {
+                $query->select('user_id', 'responsiveness', 'problem_solver', 'helpfulness', 'initiative', 'periode')
+                    ->where('periode', $selectedPeriod);
+            },
+            'kpi' => function ($query) use ($selectedPeriod) {
+                $query->select('id', 'user_id', 'percentage', 'date')
+                    ->where('kpi_type_id', 3)
+                    ->whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$selectedPeriod])
+                    ->orderBy('date', 'DESC')
+                    ->with(['kpi_detail' => function ($query) {
+                        $query->whereNotNull('value_result')->where('value_result', '>=', 0);
+                    }]);
+            }
+        ]);
+
+        // Apply filters if any
+        if ($divisionId) {
+            $userQuery->where('divisi_id', $divisionId);
+        }
+
+        if ($areaId) {
+            $userQuery->where('area_id', $areaId);
+        }
+
+        $userQuery->chunk(100, function ($users) use (&$leaderboardData) {
+            foreach ($users as $user) {
+
+                if ($user->role->name === 'ADMIN') {
+                    continue; // Skip this user
+                }
+
+                $kpiScore = 0;
+                $attendanceScore = 0;
+                $activityScore = 0;
+                $totalScore = 0;
+
+                // KPI Score Calculation
+                foreach ($user->kpi as $kpi) {
+                    $actualCount = $kpi->kpi_detail->sum('value_result');
+                    $count = $kpi->kpi_detail->count();
+                    $divisor = $count > 0 ? $count : 1;
+                    $score = ($kpi->percentage / 100) * ($actualCount / $divisor);
+                    $kpiScore += $score * 100;
+                }
+
+                // Make sure KPI score is capped at 40 and apply the weight
+                $kpiScore = min(40, $kpiScore * 0.4);
+                $totalScore += $kpiScore;
+
+                // Attendance Score Calculation
+                if ($user->attendance !== null) {
+                    $attendance = $user->attendance;
+                    $lateLess30 = $attendance->late_less_30 ?? 0;
+                    $lateMore30 = $attendance->late_more_30 ?? 0;
+                    $sickDays = $attendance->sick_days ?? 0;
+                    $permissionDays = $attendance->permission_days ?? 0; // Add if permission_days column exists
+                    $nonCompliance = $attendance->non_compliance ?? 0; // Add if non_compliance column exists
+                    $workDays = $attendance->work_days ?? 0;
+
+                    // Calculate attendance achievement percentage
+                    $initialAttendanceAchv = ($workDays > 0) ? ($workDays - $lateLess30 - $lateMore30 - $sickDays - $permissionDays - $nonCompliance) / $workDays * 100 : 0;
+
+                    // Penalty points for attendance issues
+                    $penalty = ($lateLess30 * 1) + ($lateMore30 * 3) + ($sickDays * 5) + ($permissionDays * 5) + ($nonCompliance * 5);
+
+                    // Final attendance achievement after penalties
+                    $finalAttendanceAchv = max(0, $initialAttendanceAchv - $penalty);
+
+                    // Attendance KPI weight
+                    $attendanceWeight = 40;
+
+                    // Calculate attendance score after penalty
+                    $attendanceScore = ($finalAttendanceAchv / 100) * $attendanceWeight;
+                    $totalScore += $attendanceScore;
+                }
+
+                // Activity Score Calculation
+                if ($user->employeeReview !== null) {
+                    $review = $user->employeeReview;
+                    $responsiveness = $review->responsiveness ?? 0;
+                    $problemSolver = $review->problem_solver ?? 0;
+                    $helpfulness = $review->helpfulness ?? 0;
+                    $initiative = $review->initiative ?? 0;
+
+                    // Activity Score Calculation
+                    $activityScore = ($responsiveness + $problemSolver + $helpfulness + $initiative) / 20 * 100 * 0.2;
+                    $totalScore += $activityScore;
+                }
+
+                // Append data to leaderboardData
+                $leaderboardData[] = [
+                    'user' => $user,
+                    'kpiScore' => $kpiScore,
+                    'attendanceScore' => $attendanceScore,
+                    'activityScore' => $activityScore,
+                    'totalScore' => $totalScore,
+                ];
+            }
+        });
+
+        // Sort leaderboard data by total score
+        usort($leaderboardData, function ($a, $b) {
+            return $b['totalScore'] <=> $a['totalScore'];
+        });
+
+        // Export to Excel
+        return Excel::download(new LeaderboardExport($leaderboardData), 'leaderboard.xlsx');
     }
 }

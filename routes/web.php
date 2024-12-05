@@ -153,6 +153,7 @@ Route::middleware('auth')->group(
 
         ##ROUTE LEADERBOARD
         Route::get('leaderboard', [KpiDashboardController::class, 'leaderboard']);
+        Route::get('leaderboard/export', [KpiDashboardController::class, 'export'])->name('leaderboard.export');
 
         ##Route Extra Task
         Route::post('extra-task/store', [KpiController::class, 'storeExtraTask']);
